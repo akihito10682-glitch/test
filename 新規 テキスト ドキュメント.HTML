@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地学・最重要語句クイズ</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; background: #f4f7f6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #2c3e50; }
+        .quiz-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .unit-tag { font-size: 0.8em; background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+        .question { font-weight: bold; font-size: 1.1em; margin-bottom: 15px; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #e0e0e0; }
+        button.correct { background: #2ecc71 !important; color: white; border-color: #27ae60; }
+        button.wrong { background: #e74c3c !important; color: white; border-color: #c0392b; }
+        #result { text-align: center; font-size: 1.2em; font-weight: bold; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>地学・最重要語句クイズ</h1>
+    <div id="quiz-box"></div>
+    <div id="result"></div>
+
+    <script>
+        const quizData = [
+            { unit: "火山", q: "地下にある岩石が溶けてドロドロになった物質を何というか？", ans: "マグマ", opts: ["マグマ", "溶岩", "火山灰", "鉱物"] },
+            { unit: "火山", q: "マグマが地表に流れ出したもの、またはそれが固まったものを何というか？", ans: "溶岩", opts: ["溶岩", "石基", "斑晶", "火成岩"] },
+            { unit: "地震", q: "地震の揺れの大きさを0から7までの10段階で表したものを何というか？", ans: "震度", opts: ["震度", "マグニチュード", "震源", "震央"] },
+            { unit: "地震", q: "地震そのもののエネルギーの大きさを表す数値を何というか？", ans: "マグニチュード", opts: ["マグニチュード", "震度", "震央", "主要動"] },
+            { unit: "地層", q: "サンゴの化石のように、当時の環境を知る手がかりになる化石を何というか？", ans: "示相化石", opts: ["示相化石", "示準化石", "鍵層", "堆積岩"] },
+            { unit: "地層", q: "アンモナイトの化石のように、地層ができた時代を知る手がかりになる化石を何というか？", ans: "示準化石", opts: ["示準化石", "示相化石", "露頭", "しゅう曲"] },
+            { unit: "気象基礎", q: "空気中の水蒸気が冷えて水滴に変わり始めるときの温度を何というか？", ans: "露点", opts: ["露点", "沸点", "融点", "湿度"] },
+            { unit: "気象基礎", q: "上昇した空気が膨張して温度が下がり、水蒸気が水滴となって空中に浮かんだものを何というか？", ans: "雲", opts: ["雲", "霧", "雨", "露"] },
+            { unit: "天気の変化", q: "寒い空気と温かい空気がぶつかっている境界の線を何というか？", ans: "前線", opts: ["前線", "等圧線", "等温線", "地平線"] },
+            { unit: "天気の変化", q: "日本の上空を一年中西から東へ吹いている強い風を何というか？", ans: "偏西風", opts: ["偏西風", "季節風", "貿易風", "海風"] },
+            { unit: "日本の気象", q: "夏に南東から、冬に北西から吹く、季節によって向きが変わる風を何というか？", ans: "季節風", opts: ["季節風", "偏西風", "陸風", "海風"] },
+            { unit: "日本の気象", q: "初夏の時期に停滞し、長い間雨を降らせる前線を何というか？", ans: "梅雨前線", opts: ["梅雨前線", "寒冷前線", "温暖前線", "秋雨前線"] },
+            { unit: "天体日周", q: "地球が自分自身を軸として1日に1回回転することを何というか？", ans: "自転", opts: ["自転", "公転", "日周運動", "年周運動"] },
+            { unit: "天体日周", q: "太陽が真南に来ることを何というか？", ans: "南中", opts: ["南中", "日の出", "日の入り", "天頂"] },
+            { unit: "天体年周", q: "地球が太陽のまわりを1年かけて1周することを何というか？", ans: "公転", opts: ["公転", "自転", "日周運動", "銀河系"] },
+            { unit: "天体年周", q: "北半球で、1年の中で最も昼が長い日を何というか？", ans: "夏至", opts: ["夏至", "冬至", "春分", "秋分"] },
+            { unit: "月と金星", q: "月が地球の影に入り、月が欠けて見える現象を何というか？", ans: "月食", opts: ["月食", "日食", "満ち欠け", "新月"] },
+            { unit: "月と金星", q: "太陽の光を反射して光り、地球のまわりを公転している天体は？", ans: "月", opts: ["月", "金星", "火星", "恒星"] },
+            { unit: "太陽系", q: "太陽のように、自ら光り輝いている天体を何というか？", ans: "恒星", opts: ["恒星", "惑星", "衛星", "彗星"] },
+            { unit: "太陽系", q: "地球や木星のように、恒星のまわりを公転している大きな天体を何というか？", ans: "惑星", opts: ["惑星", "恒星", "衛星", "銀河系"] }
+        ];
+
+        let score = 0;
+
+        function initQuiz() {
+            const quizBox = document.getElementById('quiz-box');
+            quizData.forEach((data, index) => {
+                const container = document.createElement('div');
+                container.className = 'quiz-container';
+                
+                // 選択肢をランダムにシャッフル
+                const shuffledOpts = [...data.opts].sort(() => Math.random() - 0.5);
+
+                container.innerHTML = `
+                    <div class="unit-tag">${data.unit}</div>
+                    <div class="question">問${index + 1}. ${data.q}</div>
+                    <div class="options" id="opts-${index}">
+                        ${shuffledOpts.map(opt => `<button onclick="checkAnswer(this, '${opt}', '${data.ans}', ${index})">${opt}</button>`).join('')}
+                    </div>
+                `;
+                quizBox.appendChild(container);
+            });
+        }
+
+        function checkAnswer(btn, selected, correct, qIndex) {
+            const buttons = document.getElementById(`opts-${qIndex}`).getElementsByTagName('button');
+            
+            // 二度押し防止
+            for (let b of buttons) b.disabled = true;
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score++;
+            } else {
+                btn.classList.add('wrong');
+                // 正解のボタンをハイライト
+                for (let b of buttons) {
+                    if (b.innerText === correct) b.classList.add('correct');
+                }
+            }
+            updateResult();
+        }
+
+        function updateResult() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = `現在のスコア: ${score} / ${quizData.length}`;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
